@@ -1,8 +1,5 @@
 # computer_vision
-Git repository for labaratory exercises done on course Computer Vision on Faculty of Electrical Enginerring and Computing in Zagreb.
-
-Course description : 
-
+Git repository for laboratory exercises done in the course Computer Vision at the Faculty of Electrical Engineering and Computing in Zagreb.
 
 ## Course Link
 [https://www.fer.unizg.hr/en/course/comvis](https://www.fer.unizg.hr/en/course/comvis)

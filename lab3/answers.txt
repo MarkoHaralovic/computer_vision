@@ -1,0 +1,11 @@
+Q: Koliko kanala imaju izlazi iz pojedinog rezidualnog bloka?
+   Značajke kojeg rezidualnog bloka su semantički najbogatije, a koje prostorno najpreciznije?
+
+A: Redom iz :
+   a) 1. : [1, 256, 160, 240]
+   b) 2.:  [1, 512, 80, 120]
+   c) 3.:  [1, 1024, 40, 60]
+   d) 4.:  [1, 2048, 20, 30]
+
+Semantički su najbogatije značajke 4.bloka, a prostorno najpreciznije značajke 1. bloka.
+

@@ -46,5 +46,6 @@ if __name__ == '__main__':
             else:
                 print(f"Features {key} values test: failed!")
         else:
+            print(f"x.shape : {x.shape}, x_target.shape : {x_target.shape}")
             print(f"Features {key} shape test: failed!")
         print("---------------------------------")

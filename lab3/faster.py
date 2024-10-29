@@ -28,6 +28,7 @@ class TwoMLPHead(nn.Module):
         super().__init__()
         self.fc6 = nn.Linear(in_channels, representation_size)
         self.fc7 = nn.Linear(representation_size, representation_size)
+        self.relu = nn.ReLU()
 
     def forward(self, x):
         """
@@ -38,6 +39,11 @@ class TwoMLPHead(nn.Module):
         after each layer.
         """
         # YOUR CODE HERE
+        x = x.flatten(start_dim=1)
+        x = self.fc6(x)
+        x = self.relu(x)
+        x = self.fc7(x)
+        x = self.relu(x)
         return x
 
 
@@ -55,12 +61,12 @@ class FastRCNNPredictor(nn.Module):
         super().__init__()
         self.cls_score = nn.Linear(
             in_channels,
-            # YOUR CODE HERE
+            num_classes
         )
         self.bbox_pred = nn.Linear(
             in_channels,
-            # YOUR CODE HERE
-        )
+            num_classes * 4
+        )   
 
     def forward(self, x):
         if x.dim() == 4:

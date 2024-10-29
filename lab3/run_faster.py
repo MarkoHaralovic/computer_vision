@@ -9,8 +9,9 @@ from resnet import resnet50
 from utils import normalize_img
 from torchvision.models.detection._utils import overwrite_eps
 from torchvision.models._meta import _COCO_CATEGORIES
+from torchvision.utils import draw_bounding_boxes 
 import numpy as np
-
+import matplotlib.pyplot as plt
 
 def generate_colormap(n):
     colormap = matplotlib.cm.get_cmap("jet", n)
@@ -53,6 +54,23 @@ if __name__ == '__main__':
     categories = _COCO_CATEGORIES
     colormap = generate_colormap(len(categories))
     boxes, scores, labels = model(img_pth)
+
+    boxes_to_draw = []
+    annotations = []
     for box, label, score in zip(boxes, labels, scores):
-        # YOUR CODE HERE
-        pass
+        if score.item() > 0.95:
+            boxes_to_draw.append(box)
+            annotation = f"label: {_COCO_CATEGORIES[label]}, score: {score*100:.2f}%"
+            annotations.append(annotation)
+    
+    boxes_to_draw = torch.stack(boxes_to_draw)
+
+    img = draw_bounding_boxes(image=torch.from_numpy(np.array(img)).permute(2,0,1),
+                              boxes=boxes_to_draw,
+                              labels=annotations,
+                              width = 5,
+                              fill=False)
+
+    img = torchvision.transforms.ToPILImage()(img) 
+
+    img.show() 

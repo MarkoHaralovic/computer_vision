@@ -32,6 +32,9 @@ class FeaturePyramidNetwork(nn.Module):
                     output_channels, output_channels, kernel_size=3, norm_layer=norm_layer
                 )
             )
+        
+        self.maxpool = nn.MaxPool2d(kernel_size=1, stride=2)
+        self.upsample = nn.Upsample(scale_factor=2,mode="nearest")
 
     def forward(self, x):
         out = dict()
@@ -41,7 +44,7 @@ class FeaturePyramidNetwork(nn.Module):
         # from the backbone labeled with keys "res2", "res3", "res4" and "res5".
         # Be careful with the order of the feature maps.
         # Index 0 in self.blend_convs and self.channel_projections corresponds
-        # tp the finest level of the pyramid, i.e. operates on the features "res2"
+        # to the finest level of the pyramid, i.e. operates on the features "res2"
         # and computes output features "fpn2".
         # Similarly, layers at the end of the list correspond to the coarsest level
         # of the pyramid, i.e. features "res5/fpn5".
@@ -50,8 +53,35 @@ class FeaturePyramidNetwork(nn.Module):
         # Use F.interpolate with mode "nearest" to upsample the features.
         # YOUR CODE HERE
 
+        fpn5 = self.channel_projections[3](x['res5'])
+        fpn5_blended = self.blend_convs[3](fpn5)
+        out['fpn5'] = fpn5_blended
+ 
+        fpn_pool = self.maxpool(fpn5_blended)
+        out['fpn_pool'] = fpn_pool
+        del fpn_pool
 
+        fpn5 = self.upsample(fpn5)
+        fpn4 = self.channel_projections[2](x['res4'])
+        fpn4 += fpn5
+        fpn4_blended  = self.blend_convs[2](fpn4)
+        out['fpn4'] = fpn4_blended
 
+        del fpn5,fpn5_blended, fpn4_blended
+        fpn4 = self.upsample(fpn4)
+        fpn3 = self.channel_projections[1](x['res3'])
+        fpn3 += fpn4
+        fpn3_blended  = self.blend_convs[1](fpn3)
+        out['fpn3'] = fpn3_blended   
+
+        del fpn4,fpn3_blended
+        fpn3 = self.upsample(fpn3)
+        fpn2 = self.channel_projections[0](x['res2'])
+        fpn2 += fpn3
+        fpn2_blended  = self.blend_convs[0](fpn2)
+        out['fpn2'] = fpn2_blended 
+
+        del fpn3,fpn2,fpn2_blended
         # Rest of the code expects a dictionary with properly ordered keys.
         ordered_out = OrderedDict()
         for k in ["fpn2", "fpn3", "fpn4", "fpn5", "fpn_pool"]:

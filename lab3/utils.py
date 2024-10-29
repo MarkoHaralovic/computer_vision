@@ -4,7 +4,8 @@ import torch.nn as nn
 
 
 def normalize_img(img, image_mean, image_std):
-    # YOUR CODE HERE
+    img = (img/255 - image_mean) / image_std
+    img = img.permute(2,0,1)
     return img
 
 
@@ -19,16 +20,18 @@ class ConvNormActBlock(torch.nn.Sequential):
         activation_layer=None,
     ):
         super().__init__()
-        padding = # YOUR CODE HERE
+        padding = (kernel_size // 2) if kernel_size % 2 == 1 else (kernel_size - stride) // 2
+
         bias = norm_layer is None
+
         self.append(
             nn.Conv2d(
                 # YOUR CODE HERE
-                in_channels=,
-                out_channels=,
-                kernel_size=,
-                padding=,
-                stride=,
+                in_channels=in_channels,
+                out_channels=out_channels,
+                kernel_size=kernel_size,
+                padding=padding,
+                stride=stride,
                 bias=bias,
             )
         )
@@ -36,6 +39,7 @@ class ConvNormActBlock(torch.nn.Sequential):
             self.append(norm_layer(out_channels))
         if activation_layer is not None:
             self.append(activation_layer())
+    
 
 
 def decode_boxes(rel_codes, boxes, weights=(1.0, 1.0, 1.0, 1.0), bbox_xform_clip=math.log(1000.0 / 16)):
@@ -55,18 +59,31 @@ def decode_boxes(rel_codes, boxes, weights=(1.0, 1.0, 1.0, 1.0), bbox_xform_clip
     ty = rel_codes[:, 1] / wy
     tw = rel_codes[:, 2] / ww
     th = rel_codes[:, 3] / wh
+
     # Prevent sending too large values into torch.exp()
     tw = torch.clamp(tw, max=bbox_xform_clip)
     th = torch.clamp(th, max=bbox_xform_clip)
 
-
     boxes = boxes.to(rel_codes.dtype)
+    decoded_boxes = torch.zeros_like(boxes)
 
     # YOUR CODE HERE
-    # widths = ...
-    # heights = ...
-    # ctr_x = ...
-    # ctr_y = ...
+    widths = boxes[:,2] - boxes[:,0]
+    heights = boxes[:,3] - boxes[:,1]
+    ctr_x = boxes[:,0] + widths / 2
+    ctr_y = boxes[:,1] +  heights / 2
+
     # Apply transformations...
+    widths*=torch.exp(tw)
+    heights*=torch.exp(th)
+    ctr_x+=tx*widths
+    ctr_y+=ty*heights
+
+    decoded_boxes[:,0] = ctr_x - widths / 2
+    decoded_boxes[:,1] = ctr_y - heights / 2
+    decoded_boxes[:,2] = ctr_x + widths / 2
+    decoded_boxes[:,3] = ctr_y + heights / 2
+
+    decoded_boxes = torch.round(decoded_boxes)
 
     return decoded_boxes

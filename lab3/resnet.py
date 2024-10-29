@@ -71,6 +71,9 @@ class Bottleneck(nn.Module):
             identity = self.downsample(x)
 
         # YOUR CODE HERE
+        out = identity + out
+        out = self.relu(out)
+
         return out
 
 
@@ -177,9 +180,14 @@ class ResNet(nn.Module):
         # YOUR CODE HERE
         # INSERT YOUR CODE BELOW ACCORDING TO YOUR PREFERENCE
         x = self.layer1(x)
+        out_dict['res2'] = x
         x = self.layer2(x)
+        out_dict['res3'] = x
         x = self.layer3(x)
+        out_dict['res4'] = x
         x = self.layer4(x)
+        out_dict['res5'] = x
+
         return out_dict
 
     def forward(self, x):

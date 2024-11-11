@@ -110,13 +110,13 @@ phi = np.degrees(np.arctan2(gradient_y, gradient_x))
 fig, ax = plt.subplots(1,1)
 ax.imshow(G,cmap="gray")
 ax.set_title("Normalized values of G")
-plt.savefig(f"./images/interim/canny/{image_name}_gradient.jpg")
+plt.savefig(f"./images/interim/canny/{image_name}/gradient.jpg")
 
 suppressed_image = non_maximum_suppresion(G,phi)
 
 plt.imshow(suppressed_image,cmap="gray")
 ax.set_title("G after nms")
-plt.savefig(f"./images/interim/canny/{image_name}_suppressed.jpg")
+plt.savefig(f"./images/interim/canny/{image_name}/suppressed.jpg")
 
 
 img_strong_edges, img_weak_edges = detect_edges(gradient_image=suppressed_image, 
@@ -127,14 +127,14 @@ img_strong_edges, img_weak_edges = detect_edges(gradient_image=suppressed_image,
 
 plt.imshow(img_strong_edges,cmap="gray")
 ax.set_title("Strong edges")
-plt.savefig(f"./images/interim/canny/{image_name}_strong_edges.jpg")
+plt.savefig(f"./images/interim/canny/{image_name}/strong_edges.jpg")
 
 plt.imshow(img_weak_edges,cmap="gray")
 ax.set_title("Weak edges")
-plt.savefig(f"./images/interim/canny/{image_name}_weak_edges.jpg")
+plt.savefig(f"./images/interim/canny/{image_name}/weak_edges.jpg")
 
 plt.imshow(img_strong_edges + img_weak_edges,cmap="gray")
 ax.set_title("Strong + weak edges")
-plt.savefig(f"./images/interim/canny/{image_name}_all_edges.jpg")
+plt.savefig(f"./images/interim/canny/{image_name}/all_edges.jpg")
 
 plt.show()

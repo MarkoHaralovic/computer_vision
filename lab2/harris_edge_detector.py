@@ -81,7 +81,8 @@ PARAMS = {
       'sliding_window_nms' : (32,32)
    }
 }
-image_name = "house" # "house"
+save = False
+image_name = "fer_logo" # "house"
 image = np.array(Image.open(PARAMS[image_name]['path']),dtype=np.float32)
 
 if len(image.shape) == 3:
@@ -120,7 +121,8 @@ axes[4].set_title("G_yy")
 axes[5].imshow(gradient_x*gradient_y,cmap='gray')
 axes[5].set_title("G_x * G_y")
 
-plt.savefig(f"./images/interim/harris/{image_name}_gradients.jpg")
+if save:
+   plt.savefig(f"./images/interim/harris/{image_name}/gradients.png")
 
 Sxx = scipy.ndimage.convolve(G_xx, kernel)
 Sxy = scipy.ndimage.convolve(G_xy, kernel)
@@ -135,17 +137,19 @@ harris_response_suppressed = non_maximum_suppression(
                         neighbourhood_size=PARAMS[image_name]['sliding_window_nms'],
                         threshold=PARAMS[image_name]['threshold'])
 
-fig, ax = plt.subplots(1, 1) 
-ax.imshow(harris_response_suppressed, cmap='gray')  
-ax.set_title("Harris response") 
-plt.savefig(f"./images/interim/harris/{image_name}_harris_response.jpg")  
+fig, axes = plt.subplots(1,2)
+axes = axes.flatten()
+axes[0].imshow(harris_response, cmap='gray')  
+axes[0].set_title("Harris response") 
+axes[1].imshow(harris_response_suppressed, cmap='gray')  
+axes[1].set_title("Harris response suppressed")  
+if save:
+   plt.savefig(f"./images/interim/harris/{image_name}/harris_response.png")  
 
 k_highest_res = k_highest_responses(
                         image=harris_response_suppressed,
                         k = PARAMS[image_name]['topk']
                         )
-
-print(len(k_highest_res[0]))
 plt.imshow(image_smoothed,cmap='gray')
 plt.scatter(k_highest_res[1], k_highest_res[0], edgecolor='red', facecolors='none', s=10)
 plt.show()
